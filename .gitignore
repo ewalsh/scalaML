@@ -1,0 +1,9 @@
+null
+.bloop
+.metals
+project/.bloop
+project/target
+*.class
+*.jar
+null
+target
