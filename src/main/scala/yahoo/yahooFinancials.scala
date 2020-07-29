@@ -7,11 +7,12 @@ package object Ch1 {
     type Fields = Array[String]
     type DblPair = (Double, Double)
     type Features = Array[Double]
+    type ObsSet = Vector[Features]
 
     object YahooFinancials extends Enumeration {
         type YahooFinancials = Value
 
-        val DATE, OPEN, HIGH, LOW, CLOSE, VOLUME, ADJ_CLOSE=Value
+        val DATE, OPEN, HIGH, LOW, CLOSE, VOLUME, ADJ_CLOSE = Value
 
         def toDouble(v: Value): Fields => Double = {
             (s: Fields) => s(v.id).toDouble
@@ -21,25 +22,35 @@ package object Ch1 {
             (s: Fields) => vs.map(v => s(v.id).toDouble)
         }
 
-        def load(filename: String): Try[Vector[DblPair]] = Try {
+        def load(filename: String): Try[ObsSet] = Try { //: Try[Vector[DblPair]]
             val src = Source.fromFile(filename)
             val data = extract(src.getLines.map(_.split(",")).drop(1))
             src.close
             data
         }
 
-        def extract(cols: Iterator[Fields]): Vector[DblPair] = {
+        def extract(cols: Iterator[Fields]): ObsSet = {
             val features = Array[YahooFinancials](LOW, HIGH, VOLUME)
             val conversion = toArray(features)
             cols.map(conversion(_)).toVector.map(x => Array[Double](1.0 - x(0)/x(1), x(2)))
         }
+
+        // class MinMax[T](val values: Vector[T]) {
+        //     val zero = (Double.MaxValue, -Double.MaxValue)
+        //     val (min, max) = values./:(zero){
+        //         case ((mn, mx), x) => {
+        //             val z = values.apply(x)
+        //             (if(z < mn) z else mn, if(z > mx) z else mx)
+        //         }
+        //     }
+        // }
 
     }
 }
 
 
 // type Weights = Array[Double]
-// type ObsSet = Vector[Features]
+
 
 // object YahooFinancials extends Enumeration {
 
